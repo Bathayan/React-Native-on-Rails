@@ -23,7 +23,7 @@ class ReactNativeRailsAuth extends Component {
       name: "",
       password: "",
       password_confirmation: "",
-      errors: ["sjdbwjkw", "chkwvk"]
+      errors: null
     }
   }
   onRegisterPressed(){
@@ -70,6 +70,12 @@ class ReactNativeRailsAuth extends Component {
     });
   }
   render() {
+    let formErrors;
+    if (this.state.errors) {
+       formErrors = <Errors errors={this.state.errors}/>
+    } else {
+       formErrors = null
+    }
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>
@@ -101,8 +107,7 @@ class ReactNativeRailsAuth extends Component {
           </Text>
         </TouchableHighlight>
 
-
-          {this.state.errors.map((error, i) => <Text key={i}> {error} </Text>)}
+        {formErrors}
 
 
       </View>
@@ -110,11 +115,11 @@ class ReactNativeRailsAuth extends Component {
   }
 }
 
-const Errors = () => {
+const Errors = (props) => {
   return (
-    <Text>
-      {props.errors.map((error) => <Text> {error} </Text>)}
-    </Text>
+    <View>
+      {props.errors.map((error, i) => <Text key={i}> {error} </Text>)}
+    </View>
   );
 }
 
