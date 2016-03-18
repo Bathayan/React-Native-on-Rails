@@ -10,9 +10,35 @@ import React, {
   TextInput,
   TouchableHighlight,
   ListView,
+  ActivityIndicatorIOS,
+  Navigator,
   Text,
   View
 } from 'react-native';
+
+import Login from './login';
+import Register from './register';
+
+// <Navigator
+//   initialRoute={{name: 'register', index: 0}, {name: 'login', index: 1}}
+//   renderScene={(route, navigator) =>
+//     <Register
+//       name={route.name}
+//       onForward={() => {
+//         var nextIndex = route.index + 1;
+//         navigator.push({
+//           name: 'Scene ' + nextIndex,
+//           index: nextIndex,
+//           component: Login
+//         });
+//       }}
+//       onBack={() => {
+//         if (route.index > 0) {
+//           navigator.pop();
+//         }
+//       }}
+//     />
+
 
 class ReactNativeRailsAuth extends Component {
   constructor(props){
@@ -23,114 +49,69 @@ class ReactNativeRailsAuth extends Component {
       name: "",
       password: "",
       password_confirmation: "",
-      errors: null
+      errors: null,
+      showProgress: false
     }
   }
-  onRegisterPressed(){
-    fetch('http://localhost:3000/users.json', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user:{
-          name: this.state.name,
-          email: this.state.email,
-          password: this.state.password,
-          password_confirmation: this.state.password_confirmation,
-        }
-      })
-    })
-    .then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        return response.text();
-      } else {
-        let error = JSON.parse(response._bodyInit);
-        error.response = JSON.parse(response._bodyInit);
-        throw error;
-      }
-    })
-    .then((responseData) => {
-      console.log(responseData);
-    })
-    .catch((errors) => {
-      console.log(errors);
 
-      let errorsArray = [];
-      for(var key in errors) {
-        //If array is bigger than one we need to split it.
-        if(errors[key].length > 1 && key != "response") {
-          errors[key].map(error => errorsArray.push(key + " " + error));
-        } else if(key != "response") {
-          errorsArray.push(key + " " + errors[key]);
-        }
-      }
-      this.setState({errors: errorsArray})
-    });
-  }
-  render() {
-    let formErrors;
-    if (this.state.errors) {
-       formErrors = <Errors errors={this.state.errors}/>
-    } else {
-       formErrors = null
+  renderScene(route, navigator) {
+    console.log(route);
+    switch (route.name) {
+      case 'Login':
+        return(
+          <Login
+          name={route.name}
+          onForward={() => {
+            var nextIndex = route.index + 1;
+            navigator.push({
+              name: 'Scene ' + nextIndex,
+              index: nextIndex,
+              component: Login
+            });
+          }}
+          onBack={() => {
+            if (route.index > 0) {
+              navigator.pop();
+            }
+          }}
+          />
+        );
+      default:
+        return (
+            <Register
+            name={route.name}
+            onForward={() => {
+              var nextIndex = route.index + 1;
+              navigator.push({
+                name: 'Login',
+              });
+            }}
+            onBack={() => {
+              if (route.index > 0) {
+                navigator.pop();
+              }
+            }}
+          />
+        );
     }
+  }
+
+  render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.heading}>
-          Native on Rails
-        </Text>
-        <TextInput
-          onChangeText={ (text)=> this.setState({email: text}) }
-          style={styles.input} placeholder="Email">
-        </TextInput>
-        <TextInput
-          onChangeText={ (text)=> this.setState({name: text}) }
-          style={styles.input} placeholder="Name">
-        </TextInput>
-        <TextInput
-          onChangeText={ (text)=> this.setState({password: text}) }
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={true}>
-        </TextInput>
-        <TextInput
-          onChangeText={ (text)=> this.setState({password_confirmation: text}) }
-          style={styles.input}
-          placeholder="Confirm Password"
-          secureTextEntry={true}>
-        </TextInput>
-        <TouchableHighlight onPress={this.onRegisterPressed.bind(this)} style={styles.button}>
-          <Text style={styles.buttonText}>
-            Register
-          </Text>
-        </TouchableHighlight>
-
-        {formErrors}
-
-
+        <Navigator
+          initialRoute={{name: 'register', index: 0}}
+          renderScene={this.renderScene.bind(this)}
+        />
       </View>
     );
   }
 }
 
-const Errors = (props) => {
-  return (
-    <View>
-      {props.errors.map((error, i) => <Text key={i}> {error} </Text>)}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
-    padding: 10,
-    paddingTop: 80
   },
   input: {
     height: 50,
@@ -155,6 +136,13 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 30,
   },
+  error: {
+    color: 'red',
+    paddingTop: 10
+  },
+  loader: {
+    marginTop: 20
+  }
 });
 
 AppRegistry.registerComponent('ReactNativeRailsAuth', () => ReactNativeRailsAuth);
