@@ -8,14 +8,13 @@ import React, {
   TouchableHighlight,
   ListView,
   ActivityIndicatorIOS,
-  Navigator,
   Text,
   View
 } from 'react-native';
 
 class Register extends Component {
-  constructor(props){
-    super(props);
+  constructor(){
+    super();
 
     this.state = {
       email: "",
@@ -25,6 +24,11 @@ class Register extends Component {
       errors: null,
       showProgress: false
     }
+  }
+  navigate(routeName){
+    this.props.navigator.push({
+      name: routeName
+    });
   }
   onRegisterPressed(){
     this.setState({showProgress: true})
@@ -57,7 +61,7 @@ class Register extends Component {
       console.log(responseData);
     })
     .catch((errors) => {
-      this.props.onForward()
+      this.navigate('login');
       console.log(errors.response);
       //The errors are in the response key
       let formErrors = errors.response;
@@ -85,7 +89,7 @@ class Register extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>
-          Native on Rails {this.props.name}
+          Native on Rails
         </Text>
         <TextInput
           onChangeText={ (text)=> this.setState({email: text}) }

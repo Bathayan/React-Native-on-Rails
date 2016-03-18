@@ -1,28 +1,30 @@
 'use strict';
 import React, {
-  AppRegistry,
   Component,
   StyleSheet,
   TextInput,
   TouchableHighlight,
-  ListView,
   ActivityIndicatorIOS,
-  Navigator,
   Text,
   View
 } from 'react-native';
 
 class Login extends Component {
-  constructor(props){
-    super(props);
+  constructor(){
+    super();
 
     this.state = {
       email: "",
       password: "",
       isLoggenIn: "",
       errors: null,
-      showProgress: false
+      showProgress: false,
     }
+  }
+  redirect(routeName){
+    this.props.navigator.push({
+      name: routeName
+    });
   }
   onRegisterPressed(){
     this.setState({showProgress: true})
@@ -49,9 +51,11 @@ class Login extends Component {
     })
     .then((responseData) => {
       console.log(responseData);
+      this.redirect('home');
       this.setState({isLoggenIn: "Welcome Brother", errors: null})
     })
     .catch((errors) => {
+      this.redirect('root');
       this.setState({errors: "Email and password combination are invalid"})
     });
   }
