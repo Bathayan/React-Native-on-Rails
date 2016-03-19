@@ -5,9 +5,12 @@ import React, {
   TextInput,
   TouchableHighlight,
   ActivityIndicatorIOS,
+  AsyncStorage,
   Text,
   View
 } from 'react-native';
+
+const ACCESS_TOKEN = 'access_token';
 
 class Login extends Component {
   constructor(){
@@ -51,16 +54,33 @@ class Login extends Component {
     })
     .then((responseData) => {
       console.log(responseData);
-      this.redirect('home');
       this.setState({isLoggenIn: "Welcome Brother", errors: null})
+      AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err,val)=> {
+        if(err){
+          console.log("an error");
+          throw err;
+        }
+      }).catch((err)=> {
+          cosole.log("error is: " + err);
+      });
     })
     .catch((errors) => {
-      this.redirect('root');
+      //this.redirect('root');
       this.setState({errors: "Email and password combination are invalid"})
     });
   }
   render() {
     //We want to check if their are any errors to show in the view.
+    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
+      if(err){
+        console.log("an error");
+        throw err;
+      }
+      console.log("The token is: " + val);
+    }).catch((err)=> {
+        console.log("error is: " + err);
+    });
+
     let formErrors;
     if (this.state.errors) {
        formErrors = <Errors errors={this.state.errors}/>

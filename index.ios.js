@@ -7,10 +7,6 @@ import React, {
   AppRegistry,
   Component,
   StyleSheet,
-  TextInput,
-  TouchableHighlight,
-  ListView,
-  ActivityIndicatorIOS,
   Navigator,
   Text,
   View
@@ -25,12 +21,7 @@ class ReactNativeRailsAuth extends Component {
     super();
 
     this.state = {
-      email: "",
-      name: "",
-      password: "",
-      password_confirmation: "",
-      errors: null,
-      showProgress: false
+      isLoggenIn: false
     }
   }
 
@@ -43,7 +34,7 @@ class ReactNativeRailsAuth extends Component {
       return <Register navigator={navigator} />
     }
     if(route.name == 'login') {
-      return <Login navigator={navigator} />
+      return <Login navigator={navigator}  txt="text sunny"/>
     }
   }
 
