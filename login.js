@@ -25,11 +25,11 @@ class Login extends Component {
       accessToken: this.getToken()
     }
   }
-  redirect(routeName){
+  redirect(routeName, accessToken){
     this.props.navigator.push({
       name: routeName,
       passProps: {
-        accessToken: this.state.accessToken
+        accessToken: accessToken
       }
     });
   }
@@ -50,7 +50,6 @@ class Login extends Component {
         console.log("an error");
         throw err;
       }
-      console.log("success");
       this.getToken();
     }).catch((err)=> {
         console.log("error is: " + err);
@@ -74,8 +73,10 @@ class Login extends Component {
     .then((response) => {
       this.setState({showProgress: false})
       if (response.status >= 200 && response.status < 300) {
-        return response.text();
+        return response._bodyText;
       } else {
+        let error = new Error(response.status);
+        error.response = response._bodyText;
         throw error;
       }
     })
@@ -84,10 +85,11 @@ class Login extends Component {
       this.setState({isLoggenIn: "Welcome Brother", errors: null})
       //On success we will store the access_token in the AsyncStorage
       this.storeToken(responseData);
-      this.redirect('home');
+      this.redirect('home', responseData);
     })
     .catch((errors) => {
-      this.setState({errors: "Email and password combination are invalid"})
+      console.log("error response: " + errors.response + " : " + errors)
+      this.setState({errors: errors.response})
     });
   }
   render() {

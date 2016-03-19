@@ -24,14 +24,14 @@ class Register extends Component {
       password_confirmation: "",
       errors: null,
       showProgress: false,
-      accessToken: this.getToken()
+      accessToken: ""
     }
   }
-  redirect(routeName){
+  redirect(routeName, accessToken){
     this.props.navigator.push({
       name: routeName,
       passProps: {
-        accessToken: this.state.accessToken
+        accessToken: accessToken
       }
     });
   }
@@ -46,16 +46,15 @@ class Register extends Component {
         console.log("error is: " + err);
     });
   }
-  storeToken(responseData){
-    AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err)=> {
+  storeToken(accessToken){
+    AsyncStorage.setItem(ACCESS_TOKEN, accessToken, (err)=> {
       if(err){
         console.log("an error");
         throw err;
       }
-      console.log("success");
-      this.getToken();
+      this.setState({accessToken: accessToken})
     }).catch((err)=> {
-        console.log("error is: " + err);
+        console.log("Something went wrong");
     });
   }
   onRegisterPressed(){
@@ -76,22 +75,22 @@ class Register extends Component {
       })
     })
     .then((response) => {
+      console.log("body_text "+response._bodyText)
       this.setState({showProgress: false})
       if (response.status >= 200 && response.status < 300) {
-        return response.text();
+        return response._bodyText;
       } else {
         let error = new Error(response.status);
         error.response = JSON.parse(response._bodyInit);
         throw error;
       }
     })
-    .then((responseData) => {
-      console.log(responseData);
-      this.storeToken(responseData);
-      this.redirect('home');
+    .then((accessToken) => {
+      console.log(accessToken);
+      this.storeToken(accessToken);
+      this.redirect('home', accessToken);
     })
     .catch((errors) => {
-      console.log(errors.response);
       //The errors are in the response key
       let formErrors = errors.response;
 

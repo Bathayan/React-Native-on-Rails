@@ -35,10 +35,10 @@ class ReactNativeRailsAuth extends Component {
       return <Register navigator={navigator} />
     }
     if(route.name == 'login') {
-      return <Login navigator={navigator}  txt="text sunny"/>
+      return <Login navigator={navigator} />
     }
     if(route.name == 'home') {
-      return <Home navigator={navigator} {...route.passProps}/>
+      return <Home navigator={navigator} {...route.passProps} />
     }
   }
 
