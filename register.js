@@ -1,16 +1,17 @@
 
 'use strict';
 import React, {
-  AppRegistry,
   Component,
   StyleSheet,
   TextInput,
   TouchableHighlight,
-  ListView,
+  AsyncStorage,
   ActivityIndicatorIOS,
   Text,
   View
 } from 'react-native';
+
+const ACCESS_TOKEN = 'access_token';
 
 class Register extends Component {
   constructor(){
@@ -22,12 +23,39 @@ class Register extends Component {
       password: "",
       password_confirmation: "",
       errors: null,
-      showProgress: false
+      showProgress: false,
+      accessToken: this.getToken()
     }
   }
-  navigate(routeName){
+  redirect(routeName){
     this.props.navigator.push({
-      name: routeName
+      name: routeName,
+      passProps: {
+        accessToken: this.state.accessToken
+      }
+    });
+  }
+  getToken(){
+    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
+      if(err){
+        console.log("an error");
+        throw err;
+      }
+      this.setState({accessToken: val})
+    }).catch((err)=> {
+        console.log("error is: " + err);
+    });
+  }
+  storeToken(responseData){
+    AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err)=> {
+      if(err){
+        console.log("an error");
+        throw err;
+      }
+      console.log("success");
+      this.getToken();
+    }).catch((err)=> {
+        console.log("error is: " + err);
     });
   }
   onRegisterPressed(){
@@ -59,9 +87,10 @@ class Register extends Component {
     })
     .then((responseData) => {
       console.log(responseData);
+      this.storeToken(responseData);
+      this.redirect('home');
     })
     .catch((errors) => {
-      this.navigate('login');
       console.log(errors.response);
       //The errors are in the response key
       let formErrors = errors.response;

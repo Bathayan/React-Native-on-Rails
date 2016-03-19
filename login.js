@@ -22,11 +22,38 @@ class Login extends Component {
       isLoggenIn: "",
       errors: null,
       showProgress: false,
+      accessToken: this.getToken()
     }
   }
   redirect(routeName){
     this.props.navigator.push({
-      name: routeName
+      name: routeName,
+      passProps: {
+        accessToken: this.state.accessToken
+      }
+    });
+  }
+  getToken(){
+    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
+      if(err){
+        console.log("an error");
+        throw err;
+      }
+      this.setState({accessToken: val})
+    }).catch((err)=> {
+        console.log("error is: " + err);
+    });
+  }
+  storeToken(responseData){
+    AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err)=> {
+      if(err){
+        console.log("an error");
+        throw err;
+      }
+      console.log("success");
+      this.getToken();
+    }).catch((err)=> {
+        console.log("error is: " + err);
     });
   }
   onRegisterPressed(){
@@ -55,32 +82,16 @@ class Login extends Component {
     .then((responseData) => {
       console.log(responseData);
       this.setState({isLoggenIn: "Welcome Brother", errors: null})
-      AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err,val)=> {
-        if(err){
-          console.log("an error");
-          throw err;
-        }
-      }).catch((err)=> {
-          cosole.log("error is: " + err);
-      });
+      //On success we will store the access_token in the AsyncStorage
+      this.storeToken(responseData);
+      this.redirect('home');
     })
     .catch((errors) => {
-      //this.redirect('root');
       this.setState({errors: "Email and password combination are invalid"})
     });
   }
   render() {
     //We want to check if their are any errors to show in the view.
-    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
-      if(err){
-        console.log("an error");
-        throw err;
-      }
-      console.log("The token is: " + val);
-    }).catch((err)=> {
-        console.log("error is: " + err);
-    });
-
     let formErrors;
     if (this.state.errors) {
        formErrors = <Errors errors={this.state.errors}/>

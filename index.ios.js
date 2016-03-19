@@ -15,6 +15,7 @@ import React, {
 import Login from './login';
 import Register from './register';
 import Root from './root';
+import Home from './home';
 
 class ReactNativeRailsAuth extends Component {
   constructor(){
@@ -35,6 +36,9 @@ class ReactNativeRailsAuth extends Component {
     }
     if(route.name == 'login') {
       return <Login navigator={navigator}  txt="text sunny"/>
+    }
+    if(route.name == 'home') {
+      return <Home navigator={navigator} {...route.passProps}/>
     }
   }
 
