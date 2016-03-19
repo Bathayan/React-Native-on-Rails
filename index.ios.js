@@ -22,7 +22,7 @@ class ReactNativeRailsAuth extends Component {
     super();
 
     this.state = {
-      isLoggenIn: false
+      isLoggenIn: ""
     }
   }
 

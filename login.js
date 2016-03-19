@@ -19,7 +19,6 @@ class Login extends Component {
     this.state = {
       email: "",
       password: "",
-      isLoggenIn: "",
       errors: null,
       showProgress: false,
     }

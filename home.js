@@ -46,7 +46,7 @@ class Home extends Component {
         console.log("Something went wrong");
     });
   }
-  redirect(routeName, accessToken){
+  redirect(routeName){
     this.props.navigator.push({
       name: routeName
     });
