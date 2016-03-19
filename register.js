@@ -24,7 +24,6 @@ class Register extends Component {
       password_confirmation: "",
       errors: null,
       showProgress: false,
-      accessToken: ""
     }
   }
   redirect(routeName, accessToken){
@@ -35,24 +34,12 @@ class Register extends Component {
       }
     });
   }
-  getToken(){
-    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
-      if(err){
-        console.log("an error");
-        throw err;
-      }
-      this.setState({accessToken: val})
-    }).catch((err)=> {
-        console.log("error is: " + err);
-    });
-  }
   storeToken(accessToken){
     AsyncStorage.setItem(ACCESS_TOKEN, accessToken, (err)=> {
       if(err){
-        console.log("an error");
         throw err;
       }
-      this.setState({accessToken: accessToken})
+      console.log("success");
     }).catch((err)=> {
         console.log("Something went wrong");
     });

@@ -22,7 +22,6 @@ class Login extends Component {
       isLoggenIn: "",
       errors: null,
       showProgress: false,
-      accessToken: this.getToken()
     }
   }
   redirect(routeName, accessToken){
@@ -33,24 +32,13 @@ class Login extends Component {
       }
     });
   }
-  getToken(){
-    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
-      if(err){
-        console.log("an error");
-        throw err;
-      }
-      this.setState({accessToken: val})
-    }).catch((err)=> {
-        console.log("error is: " + err);
-    });
-  }
   storeToken(responseData){
     AsyncStorage.setItem(ACCESS_TOKEN, responseData, (err)=> {
       if(err){
         console.log("an error");
         throw err;
       }
-      this.getToken();
+      console.log("success");
     }).catch((err)=> {
         console.log("error is: " + err);
     });
