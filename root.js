@@ -60,7 +60,7 @@ class Root extends Component {
     .catch((errors) => {
       return errors.text();
     })
-    then((errors) => {
+    .then((errors) => {
       console.log("error response: " + errors);
     });
   }
