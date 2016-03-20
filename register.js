@@ -62,13 +62,12 @@ class Register extends Component {
       })
     })
     .then((response) => {
-      console.log("body_text "+response._bodyText)
+      //console.log("body_text "+response._bodyText)
       this.setState({showProgress: false})
       if (response.status >= 200 && response.status < 300) {
-        return response._bodyText;
+        return response.text();
       } else {
-        let error = new Error(response.status);
-        error.response = JSON.parse(response._bodyInit);
+        let error = response;
         throw error;
       }
     })
@@ -78,9 +77,13 @@ class Register extends Component {
       this.redirect('home', accessToken);
     })
     .catch((errors) => {
-      //The errors are in the response key
-      let formErrors = errors.response;
-
+      //Return the text response to the next promise handler.
+      return errors.text();
+    })
+    .then((errors) => {
+      //errors are in JSON form so we must parse them first.
+      let formErrors = JSON.parse(errors);
+      //We will store all the errors in the array.
       let errorsArray = [];
       for(var key in formErrors) {
         //If array is bigger than one we need to split it.

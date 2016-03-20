@@ -19,18 +19,22 @@ class Home extends Component {
     this.state = {
       isLoggenIn: "",
       showProgress: false,
-      accessToken: this.getToken(),
+      accessToken: "",
     }
   }
+  componentWillMount() {
+    this.getToken();
+  }
   getToken(){
-    AsyncStorage.getItem(ACCESS_TOKEN, (err,val)=> {
+    AsyncStorage.getItem(ACCESS_TOKEN, (err,accessToken)=> {
       if(err){
         throw err;
       }
-      if(!val){
+      if(!accessToken){
         this.redirect('login');
+      } else {
+        this.setState({accessToken: accessToken})
       }
-      this.setState({accessToken: val})
     }).catch((err)=> {
         console.log("Something went wrong");
         this.redirect('login');

@@ -2,10 +2,8 @@
 import React, {
   Component,
   StyleSheet,
-  TextInput,
   TouchableHighlight,
   AsyncStorage,
-  Navigator,
   Text,
   View
 } from 'react-native';
@@ -16,9 +14,11 @@ class Root extends Component {
   constructor(){
     super();
     this.state = {
-      isLoggenIn: "",
-      accessToken: this.getToken()
+      accessToken: ""
     }
+  }
+  componentWillMount() {
+    this.getToken();
   }
   navigate(routeName) {
     this.props.navigator.push({
@@ -31,24 +31,25 @@ class Root extends Component {
         throw err;
       }
       if(!accessToken){
-
+        console.log("Token not set")
+      } else {
+        this.setState({accessToken: accessToken})
+        this.verifyToken()
       }
-      this.setState({accessToken: accessToken})
-      this.verifyToken()
     }).catch((err)=> {
         console.log("Something went wrong");
     });
   }
+  //If token is verified we will redirect the user to the home page
   verifyToken() {
     let accessToken = this.state.accessToken;
     fetch('http://localhost:3000/verify.json?session%5Baccess_token%5D='+accessToken)
     .then((response) => {
       console.log("verified? " + response._bodyText)
       if (response.status >= 200 && response.status < 300) {
-        return response._bodyText;
+        return response.text();
       } else {
-        let error = new Error(response.status);
-        error.response = response._bodyText;
+        let error = response;
         throw error;
       }
     })
@@ -57,14 +58,16 @@ class Root extends Component {
       this.navigate('home');
     })
     .catch((errors) => {
-      console.log("error response: " + errors.response);
+      return errors.text();
+    })
+    then((errors) => {
+      console.log("error response: " + errors);
     });
   }
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Welcome Friend {this.state.isLoggenIn}</Text>
-        <Text>{this.state.accessToken}</Text>
         <TouchableHighlight onPress={ this.navigate.bind(this,'register') } style={styles.button}>
           <Text style={styles.buttonText}>Register</Text>
         </TouchableHighlight>

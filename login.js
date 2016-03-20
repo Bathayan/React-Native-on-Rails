@@ -60,23 +60,24 @@ class Login extends Component {
     .then((response) => {
       this.setState({showProgress: false})
       if (response.status >= 200 && response.status < 300) {
-        return response._bodyText;
+        return response.text();
       } else {
-        let error = new Error(response.status);
-        error.response = response._bodyText;
+        let error = response;
         throw error;
       }
     })
-    .then((responseData) => {
-      console.log(responseData);
-      this.setState({isLoggenIn: "Welcome Brother", errors: null})
+    .then((accessToken) => {
+      console.log(accessToken);
       //On success we will store the access_token in the AsyncStorage
-      this.storeToken(responseData);
-      this.redirect('home', responseData);
+      this.storeToken(accessToken);
+      this.redirect('home', accessToken);
     })
     .catch((errors) => {
-      console.log("error response: " + errors.response + " : " + errors)
-      this.setState({errors: errors.response})
+      //Return the text response to the next promise handler.
+      return errors.text();
+    })
+    .then((errors) => {
+      this.setState({errors: errors});
     });
   }
   render() {
