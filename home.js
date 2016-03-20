@@ -6,6 +6,7 @@ import React, {
   TouchableHighlight,
   ActivityIndicatorIOS,
   AsyncStorage,
+  AlertIOS,
   Text,
   View
 } from 'react-native';
@@ -59,6 +60,11 @@ class Home extends Component {
     this.setState({showProgress: true})
     this.deleteToken();
   }
+  confirmDelete() {
+    AlertIOS.alert("Are you sure?", "This action cannot be undone", [
+      {text: 'Cancel'}, {text: 'Delete', onPress: () => this.onDelete()}
+    ]);
+  }
   async onDelete(){
     let access_token = this.state.accessToken
     try {
@@ -90,7 +96,7 @@ class Home extends Component {
             Logout
           </Text>
         </TouchableHighlight>
-        <TouchableHighlight onPress={this.onDelete.bind(this)} style={styles.button}>
+        <TouchableHighlight onPress={this.confirmDelete.bind(this)} style={styles.button}>
           <Text style={styles.buttonText}>
             Delete Account
           </Text>
