@@ -1,4 +1,3 @@
-
 'use strict';
 import React, {
   Component,
@@ -13,9 +12,9 @@ import React, {
 
 const ACCESS_TOKEN = 'access_token';
 
-class Register extends Component {
-  constructor(){
-    super();
+class Update extends Component {
+  constructor(props){
+    super(props);
 
     this.state = {
       email: "",
@@ -24,31 +23,47 @@ class Register extends Component {
       password_confirmation: "",
       errors: null,
       showProgress: false,
+      accessToken: this.props.accessToken,
     }
   }
-  redirect(routeName, accessToken){
+  componentWillMount() {
+    this.fetchUserData();
+  }
+  redirect(routeName, flash) {
     this.props.navigator.push({
       name: routeName,
       passProps: {
-        accessToken: accessToken
+        flash: flash
       }
     });
   }
-  storeToken(accessToken){
-    AsyncStorage.setItem(ACCESS_TOKEN, accessToken, (err)=> {
-      if(err){
-        throw err;
-      }
-      console.log("success");
-    }).catch((err)=> {
-        console.log("Something went wrong");
-    });
-  }
-  async onRegisterPressed() {
-    this.setState({showProgress: true})
+  async fetchUserData() {
+    let access_token = this.state.accessToken;
     try {
-      let response = await fetch('http://localhost:3000/api/users', {
-                              method: 'POST',
+      let response = await fetch("http://localhost:3000/api/users/"+access_token+"/edit");
+      let res = await response.text();
+      if (response.status >= 200 && response.status < 300) {
+          //Handle success
+          let userData = JSON.parse(res);
+          for(let data in userData) {
+            this.setState({[data]:userData[data]});
+          }
+      } else {
+          //Handle error
+          let error = res;
+          throw err;
+      }
+    } catch(error) {
+      //If something went wrong we will redirect to the login page
+      this.redirect('login');
+    }
+  }
+  async onUpdatePressed() {
+    this.setState({showProgress: true});
+    let access_token = this.state.accessToken;
+    try {
+      let response = await fetch("http://localhost:3000/api/users/"+access_token, {
+                              method: 'PATCH',
                               headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json',
@@ -61,35 +76,31 @@ class Register extends Component {
                                   password_confirmation: this.state.password_confirmation,
                                 }
                               })
-                            });
+                           });
       let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
-          //Handle success
-          let accessToken = res;
-          console.log(accessToken);
-          //On success we will store the access_token in the AsyncStorage
-          this.storeToken(accessToken);
-          this.redirect('home', accessToken);
+          //On success we redirect to home with flash success message
+          this.redirect('home', res)
       } else {
-          //Handle error
+          //Handle errors
           let error = res;
-          throw error;
+          throw error
       }
     } catch(errors) {
-      //errors are in JSON form so we must parse them first.
-      let formErrors = JSON.parse(errors);
-      //We will store all the errors in the array.
-      let errorsArray = [];
-      for(var key in formErrors) {
-        //If array is bigger than one we need to split it.
-        if(formErrors[key].length > 1) {
+        //errors are in JSON form so we must parse them first.
+        let formErrors = JSON.parse(errors);
+        //We will store all the errors in the array.
+        let errorsArray = [];
+        for(var key in formErrors) {
+          //If array is bigger than one we need to split it.
+          if(formErrors[key].length > 1) {
             formErrors[key].map(error => errorsArray.push(key + " " + error));
-        } else {
+          } else {
             errorsArray.push(key + " " + formErrors[key]);
+          }
         }
-      }
-      this.setState({errors: errorsArray})
-      this.setState({showProgress: false});
+        this.setState({errors: errorsArray})
+        this.setState({showProgress: false});
     }
   }
   render() {
@@ -107,11 +118,11 @@ class Register extends Component {
         </Text>
         <TextInput
           onChangeText={ (text)=> this.setState({email: text}) }
-          style={styles.input} placeholder="Email">
+          style={styles.input} placeholder="Email" value={this.state.email}>
         </TextInput>
         <TextInput
           onChangeText={ (text)=> this.setState({name: text}) }
-          style={styles.input} placeholder="Name">
+          style={styles.input} placeholder="Name" value={this.state.name}>
         </TextInput>
         <TextInput
           onChangeText={ (text)=> this.setState({password: text}) }
@@ -125,9 +136,9 @@ class Register extends Component {
           placeholder="Confirm Password"
           secureTextEntry={true}>
         </TextInput>
-        <TouchableHighlight onPress={this.onRegisterPressed.bind(this)} style={styles.button}>
+        <TouchableHighlight onPress={this.onUpdatePressed.bind(this)} style={styles.button}>
           <Text style={styles.buttonText}>
-            Register
+            Update
           </Text>
         </TouchableHighlight>
 
@@ -188,4 +199,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Register
+export default Update;

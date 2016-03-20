@@ -16,6 +16,7 @@ import Login from './login';
 import Register from './register';
 import Root from './root';
 import Home from './home';
+import Update from './update';
 
 class ReactNativeRailsAuth extends Component {
   constructor(){
@@ -39,6 +40,9 @@ class ReactNativeRailsAuth extends Component {
     }
     if(route.name == 'home') {
       return <Home navigator={navigator} {...route.passProps} />
+    }
+    if(route.name == 'update') {
+      return <Update navigator={navigator} {...route.passProps} />
     }
   }
 

@@ -21,6 +21,7 @@ class Home extends Component {
       isLoggenIn: "",
       showProgress: false,
       accessToken: "",
+      flash: this.props.flash
     }
   }
   componentWillMount() {
@@ -53,7 +54,10 @@ class Home extends Component {
   }
   redirect(routeName){
     this.props.navigator.push({
-      name: routeName
+      name: routeName,
+      passProps: {
+        accessToken: this.state.accessToken
+      }
     });
   }
   onLogout(){
@@ -78,6 +82,7 @@ class Home extends Component {
         let res = await response.text();
         if (response.status >= 200 && response.status < 300) {
           console.log("success sir: " + res)
+          this.redirect('root');
         } else {
           let error = res;
           throw error;
@@ -87,13 +92,26 @@ class Home extends Component {
     }
   }
   render() {
+    let flashMessage;
+    if (this.state.flash) {
+       flashMessage = <FlashMessage flash={this.state.flash}/>
+    } else {
+       flashMessage = null
+    }
     return(
       <View style={styles.container}>
+        {flashMessage}
         <Text style={styles.title}> Welcome New User </Text>
-        <Text> Your new token is {this.state.accessToken} </Text>
+        <Text style={styles.text}> Your new token is {this.state.accessToken} </Text>
+
         <TouchableHighlight onPress={this.onLogout.bind(this)} style={styles.button}>
           <Text style={styles.buttonText}>
             Logout
+          </Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={this.redirect.bind(this, 'update')} style={styles.button}>
+          <Text style={styles.buttonText}>
+            Update Account
           </Text>
         </TouchableHighlight>
         <TouchableHighlight onPress={this.confirmDelete.bind(this)} style={styles.button}>
@@ -108,30 +126,48 @@ class Home extends Component {
   }
 }
 
+const FlashMessage = (props) => {
+  return (
+    <View>
+      <Text style={styles.flash}>{props.flash}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
     padding: 10,
-    paddingTop: 180
   },
   title: {
     fontSize: 25,
+    marginTop: 15,
     marginBottom: 15
+  },
+  text: {
+    marginBottom: 30
   },
   button: {
     height: 50,
     backgroundColor: 'red',
     alignSelf: 'stretch',
-    marginTop: 80,
-    justifyContent: 'center'
+    marginTop: 10,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   buttonText: {
     fontSize: 22,
     color: '#FFF',
     alignSelf: 'center'
+  },
+  flash: {
+    height: 40,
+    backgroundColor: '#00ff00',
+    padding: 10,
+    alignSelf: 'center',
   },
   loader: {
     marginTop: 20
