@@ -47,7 +47,7 @@ class Register extends Component {
   async onRegisterPressed() {
     this.setState({showProgress: true})
     try {
-      let response = await fetch('http://localhost:3000/users.json', {
+      let response = await fetch('http://localhost:3000/api/users', {
                               method: 'POST',
                               headers: {
                                 'Accept': 'application/json',

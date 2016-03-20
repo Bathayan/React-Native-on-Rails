@@ -59,6 +59,27 @@ class Home extends Component {
     this.setState({showProgress: true})
     this.deleteToken();
   }
+  async onDelete(){
+    let access_token = this.state.accessToken
+    try {
+      let response = await fetch('http://localhost:3000/api/users/'+access_token,{
+                              method: 'DELETE',
+                              headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                              }
+                            });
+        let res = await response.text();
+        if (response.status >= 200 && response.status < 300) {
+          console.log("success sir: " + res)
+        } else {
+          let error = res;
+          throw error;
+        }
+    } catch(error) {
+      console.log("error: " + error)
+    }
+  }
   render() {
     return(
       <View style={styles.container}>
@@ -67,6 +88,11 @@ class Home extends Component {
         <TouchableHighlight onPress={this.onLogout.bind(this)} style={styles.button}>
           <Text style={styles.buttonText}>
             Logout
+          </Text>
+        </TouchableHighlight>
+        <TouchableHighlight onPress={this.onDelete.bind(this)} style={styles.button}>
+          <Text style={styles.buttonText}>
+            Delete Account
           </Text>
         </TouchableHighlight>
 
