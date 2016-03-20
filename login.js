@@ -42,43 +42,40 @@ class Login extends Component {
         console.log("error is: " + err);
     });
   }
-  onRegisterPressed(){
+  async onLoginPressed() {
     this.setState({showProgress: true})
-    fetch('http://localhost:3000/login.json', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        session:{
-          email: this.state.email,
-          password: this.state.password,
-        }
-      })
-    })
-    .then((response) => {
-      this.setState({showProgress: false})
+    try {
+      let response = await fetch('http://localhost:3000/login.json', {
+                              method: 'POST',
+                              headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                session:{
+                                  email: this.state.email,
+                                  password: this.state.password,
+                                }
+                              })
+                            });
+      let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
-        return response.text();
+        //Handle success
+        let accessToken = res;
+        console.log(accessToken);
+        //On success we will store the access_token in the AsyncStorage
+        this.storeToken(accessToken);
+        this.redirect('home', accessToken);
       } else {
-        let error = response;
+        //Handle error
+        let error = res;
         throw error;
       }
-    })
-    .then((accessToken) => {
-      console.log(accessToken);
-      //On success we will store the access_token in the AsyncStorage
-      this.storeToken(accessToken);
-      this.redirect('home', accessToken);
-    })
-    .catch((errors) => {
-      //Return the text response to the next promise handler.
-      return errors.text();
-    })
-    .then((errors) => {
-      this.setState({errors: errors});
-    });
+    } catch(error) {
+      this.setState({errors: error});
+      console.log("error " + error);
+      this.setState({showProgress: false});
+    }
   }
   render() {
     //We want to check if their are any errors to show in the view.
@@ -103,12 +100,12 @@ class Login extends Component {
           placeholder="Password"
           secureTextEntry={true}>
         </TextInput>
-        <TouchableHighlight onPress={this.onRegisterPressed.bind(this)} style={styles.button}>
+        <TouchableHighlight onPress={this.onLoginPressed.bind(this)} style={styles.button}>
           <Text style={styles.buttonText}>
             Login
           </Text>
         </TouchableHighlight>
-        <Text style={styles.success}>{this.state.isLoggenIn}</Text>
+
         {formErrors}
 
         <ActivityIndicatorIOS animating={this.state.showProgress} size="large" style={styles.loader} />

@@ -41,28 +41,22 @@ class Root extends Component {
     });
   }
   //If token is verified we will redirect the user to the home page
-  verifyToken() {
+  async verifyToken() {
     let accessToken = this.state.accessToken;
-    fetch('http://localhost:3000/verify.json?session%5Baccess_token%5D='+accessToken)
-    .then((response) => {
-      console.log("verified? " + response._bodyText)
+    try {
+      let response = await fetch('http://localhost:3000/verify.json?session%5Baccess_token%5D='+accessToken);
+      let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
-        return response.text();
+        //Verified token means user is loggen in to we redirect to home.
+        this.navigate('home');
       } else {
-        let error = response;
+        //Handle error
+        let error = res;
         throw error;
       }
-    })
-    .then((responseData) => {
-      console.log(responseData);
-      this.navigate('home');
-    })
-    .catch((errors) => {
-      return errors.text();
-    })
-    .then((errors) => {
-      console.log("error response: " + errors);
-    });
+    } catch(error) {
+        console.log("error response: " + error);
+    }
   }
   render() {
     return (

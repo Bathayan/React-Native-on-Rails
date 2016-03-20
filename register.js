@@ -44,43 +44,38 @@ class Register extends Component {
         console.log("Something went wrong");
     });
   }
-  onRegisterPressed(){
+  async onRegisterPressed() {
     this.setState({showProgress: true})
-    fetch('http://localhost:3000/users.json', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user:{
-          name: this.state.name,
-          email: this.state.email,
-          password: this.state.password,
-          password_confirmation: this.state.password_confirmation,
-        }
-      })
-    })
-    .then((response) => {
-      //console.log("body_text "+response._bodyText)
-      this.setState({showProgress: false})
+    try {
+      let response = await fetch('http://localhost:3000/users.json', {
+                              method: 'POST',
+                              headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                user:{
+                                  name: this.state.name,
+                                  email: this.state.email,
+                                  password: this.state.password,
+                                  password_confirmation: this.state.password_confirmation,
+                                }
+                              })
+                            });
+      let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
-        return response.text();
+        //Handle success
+        let accessToken = res;
+        console.log(accessToken);
+        //On success we will store the access_token in the AsyncStorage
+        this.storeToken(accessToken);
+        this.redirect('home', accessToken);
       } else {
-        let error = response;
+        //Handle error
+        let error = res;
         throw error;
       }
-    })
-    .then((accessToken) => {
-      console.log(accessToken);
-      this.storeToken(accessToken);
-      this.redirect('home', accessToken);
-    })
-    .catch((errors) => {
-      //Return the text response to the next promise handler.
-      return errors.text();
-    })
-    .then((errors) => {
+    } catch(errors) {
       //errors are in JSON form so we must parse them first.
       let formErrors = JSON.parse(errors);
       //We will store all the errors in the array.
@@ -94,7 +89,8 @@ class Register extends Component {
         }
       }
       this.setState({errors: errorsArray})
-    });
+      this.setState({showProgress: false});
+    }
   }
   render() {
     //We want to check if their are any errors to show in the view.
