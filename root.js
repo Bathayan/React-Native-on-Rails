@@ -31,10 +31,10 @@ class Root extends Component {
         throw err;
       }
       if(!accessToken){
-        console.log("Token not set")
+          console.log("Token not set")
       } else {
-        this.setState({accessToken: accessToken})
-        this.verifyToken()
+          this.setState({accessToken: accessToken})
+          this.verifyToken()
       }
     }).catch((err)=> {
         console.log("Something went wrong");
@@ -44,7 +44,7 @@ class Root extends Component {
   async verifyToken() {
     let accessToken = this.state.accessToken;
     try {
-      let response = await fetch('http://localhost:3000/api/verify?session%5Baccess_token%5D='+accessToken);
+      let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/verify?session%5Baccess_token%5D='+accessToken);
       let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
         //Verified token means user is loggen in to we redirect to home.

@@ -21,7 +21,7 @@ class Home extends Component {
       isLoggenIn: "",
       showProgress: false,
       accessToken: "",
-      flash: this.props.flash
+      flash: this.props.flash,
     }
   }
   componentWillMount() {
@@ -72,7 +72,7 @@ class Home extends Component {
   async onDelete(){
     let access_token = this.state.accessToken
     try {
-      let response = await fetch('http://localhost:3000/api/users/'+access_token,{
+      let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/users/'+access_token,{
                               method: 'DELETE',
                               headers: {
                                 'Accept': 'application/json',
@@ -101,7 +101,7 @@ class Home extends Component {
     return(
       <View style={styles.container}>
         {flashMessage}
-        <Text style={styles.title}> Welcome New User </Text>
+        <Text style={styles.title}> Welcome User </Text>
         <Text style={styles.text}> Your new token is {this.state.accessToken} </Text>
 
         <TouchableHighlight onPress={this.onLogout.bind(this)} style={styles.button}>

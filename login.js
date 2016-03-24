@@ -23,6 +23,9 @@ class Login extends Component {
       showProgress: false,
     }
   }
+  onBack() {
+    this.props.navigator.pop();
+  }
   redirect(routeName, accessToken){
     this.props.navigator.push({
       name: routeName,
@@ -45,7 +48,7 @@ class Login extends Component {
   async onLoginPressed() {
     this.setState({showProgress: true})
     try {
-      let response = await fetch('http://localhost:3000/api/login', {
+      let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/login', {
                               method: 'POST',
                               headers: {
                                 'Accept': 'application/json',

@@ -47,7 +47,7 @@ class Register extends Component {
   async onRegisterPressed() {
     this.setState({showProgress: true})
     try {
-      let response = await fetch('http://localhost:3000/api/users', {
+      let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/users', {
                               method: 'POST',
                               headers: {
                                 'Accept': 'application/json',
@@ -83,9 +83,9 @@ class Register extends Component {
       for(var key in formErrors) {
         //If array is bigger than one we need to split it.
         if(formErrors[key].length > 1) {
-            formErrors[key].map(error => errorsArray.push(key + " " + error));
+            formErrors[key].map(error => errorsArray.push(`${key} ${error}`));
         } else {
-            errorsArray.push(key + " " + formErrors[key]);
+            errorsArray.push(`${key} ${formErrors[key]}`);
         }
       }
       this.setState({errors: errorsArray})
@@ -103,7 +103,7 @@ class Register extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>
-          Native on Rails
+          Join us now!
         </Text>
         <TextInput
           onChangeText={ (text)=> this.setState({email: text}) }
