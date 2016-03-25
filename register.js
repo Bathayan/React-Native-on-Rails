@@ -22,7 +22,7 @@ class Register extends Component {
       name: "",
       password: "",
       password_confirmation: "",
-      errors: null,
+      errors: [],
       showProgress: false,
     }
   }
@@ -93,13 +93,6 @@ class Register extends Component {
     }
   }
   render() {
-    //We want to check if their are any errors to show in the view.
-    let formErrors;
-    if (this.state.errors) {
-       formErrors = <Errors errors={this.state.errors}/>
-    } else {
-       formErrors = null
-    }
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>
@@ -131,7 +124,7 @@ class Register extends Component {
           </Text>
         </TouchableHighlight>
 
-        {formErrors}
+        <Errors errors={this.state.errors}/>
 
         <ActivityIndicatorIOS animating={this.state.showProgress} size="large" style={styles.loader} />
       </View>
