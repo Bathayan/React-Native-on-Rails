@@ -28,21 +28,17 @@ class Register extends Component {
   }
   redirect(routeName, accessToken){
     this.props.navigator.push({
-      name: routeName,
-      passProps: {
-        accessToken: accessToken
-      }
+      name: routeName
     });
   }
-  storeToken(accessToken){
-    AsyncStorage.setItem(ACCESS_TOKEN, accessToken, (err)=> {
-      if(err){
-        throw err;
-      }
-      console.log("success");
-    }).catch((err)=> {
+
+  async storeToken(accessToken) {
+    try {
+        await AsyncStorage.setItem(ACCESS_TOKEN, accessToken);
+        console.log("Token was stored successfull ");
+    } catch(error) {
         console.log("Something went wrong");
-    });
+    }
   }
   async onRegisterPressed() {
     this.setState({showProgress: true})
@@ -69,7 +65,7 @@ class Register extends Component {
           console.log(accessToken);
           //On success we will store the access_token in the AsyncStorage
           this.storeToken(accessToken);
-          this.redirect('home', accessToken);
+          this.redirect('home');
       } else {
           //Handle error
           let error = res;

@@ -19,19 +19,13 @@ class Login extends Component {
     this.state = {
       email: "",
       password: "",
-      errors: null,
+      error: "",
       showProgress: false,
     }
   }
-  onBack() {
-    this.props.navigator.pop();
-  }
   redirect(routeName, accessToken){
     this.props.navigator.push({
-      name: routeName,
-      passProps: {
-        accessToken: accessToken
-      }
+      name: routeName
     });
   }
   storeToken(responseData){
@@ -63,31 +57,25 @@ class Login extends Component {
                             });
       let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
-        //Handle success
-        let accessToken = res;
-        console.log(accessToken);
-        //On success we will store the access_token in the AsyncStorage
-        this.storeToken(accessToken);
-        this.redirect('home', accessToken);
+          //Handle success
+          let accessToken = res;
+          console.log(accessToken);
+          //On success we will store the access_token in the AsyncStorage
+          this.storeToken(accessToken);
+          this.redirect('home');
       } else {
-        //Handle error
-        let error = res;
-        throw error;
+          //Handle error
+          let error = res;
+          throw error;
       }
     } catch(error) {
-      this.setState({errors: error});
-      console.log("error " + error);
-      this.setState({showProgress: false});
+        this.setState({error: error});
+        console.log("error " + error);
+        this.setState({showProgress: false});
     }
   }
   render() {
-    //We want to check if their are any errors to show in the view.
-    let formErrors;
-    if (this.state.errors) {
-       formErrors = <Errors errors={this.state.errors}/>
-    } else {
-       formErrors = null
-    }
+
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>
@@ -109,20 +97,14 @@ class Login extends Component {
           </Text>
         </TouchableHighlight>
 
-        {formErrors}
+        <Text style={styles.error}>
+          {this.state.error}
+        </Text>
 
         <ActivityIndicatorIOS animating={this.state.showProgress} size="large" style={styles.loader} />
       </View>
     );
   }
-}
-
-const Errors = (props) => {
-  return (
-    <View>
-      <Text style={styles.error}>{props.errors}</Text>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({

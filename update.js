@@ -21,7 +21,7 @@ class Update extends Component {
       name: "",
       password: "",
       password_confirmation: "",
-      errors: null,
+      errors: [],
       showProgress: false,
       accessToken: this.props.accessToken,
     }
@@ -46,6 +46,7 @@ class Update extends Component {
           //Handle success
           let userData = JSON.parse(res);
           for(let data in userData) {
+            console.log("data is: " + data);
             this.setState({[data]:userData[data]});
           }
       } else {
@@ -54,8 +55,8 @@ class Update extends Component {
           throw err;
       }
     } catch(error) {
-      //If something went wrong we will redirect to the login page
-      this.redirect('login');
+        //If something went wrong we will redirect to the login page
+        this.redirect('login');
     }
   }
   async onUpdatePressed() {
@@ -104,13 +105,7 @@ class Update extends Component {
     }
   }
   render() {
-    //We want to check if their are any errors to show in the view.
-    let formErrors;
-    if (this.state.errors) {
-       formErrors = <Errors errors={this.state.errors}/>
-    } else {
-       formErrors = null
-    }
+
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>
@@ -118,11 +113,11 @@ class Update extends Component {
         </Text>
         <TextInput
           onChangeText={ (text)=> this.setState({email: text}) }
-          style={styles.input} placeholder="Email" value={this.state.email}>
+          style={styles.input} value={this.state.email}>
         </TextInput>
         <TextInput
           onChangeText={ (text)=> this.setState({name: text}) }
-          style={styles.input} placeholder="Name" value={this.state.name}>
+          style={styles.input} value={this.state.name}>
         </TextInput>
         <TextInput
           onChangeText={ (text)=> this.setState({password: text}) }
@@ -142,7 +137,7 @@ class Update extends Component {
           </Text>
         </TouchableHighlight>
 
-        {formErrors}
+        <Errors errors={this.state.errors}/>
 
         <ActivityIndicatorIOS animating={this.state.showProgress} size="large" style={styles.loader} />
       </View>

@@ -11,12 +11,7 @@ import React, {
 const ACCESS_TOKEN = 'access_token';
 
 class Root extends Component {
-  constructor(){
-    super();
-    this.state = {
-      accessToken: ""
-    }
-  }
+
   componentWillMount() {
     this.getToken();
   }
@@ -25,24 +20,23 @@ class Root extends Component {
       name: routeName
     });
   }
-  getToken(){
-    AsyncStorage.getItem(ACCESS_TOKEN, (err,accessToken)=> {
-      if(err){
-        throw err;
-      }
-      if(!accessToken){
-          console.log("Token not set")
+
+  async getToken() {
+    try {
+      let accessToken = await AsyncStorage.getItem(ACCESS_TOKEN);
+      if(!accessToken) {
+          console.log("Token not set");
       } else {
-          this.setState({accessToken: accessToken})
-          this.verifyToken()
+          this.verifyToken(accessToken)
       }
-    }).catch((err)=> {
+    } catch(error) {
         console.log("Something went wrong");
-    });
+    }
   }
   //If token is verified we will redirect the user to the home page
-  async verifyToken() {
-    let accessToken = this.state.accessToken;
+  async verifyToken(token) {
+    let accessToken = token
+
     try {
       let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/verify?session%5Baccess_token%5D='+accessToken);
       let res = await response.text();
@@ -50,9 +44,9 @@ class Root extends Component {
         //Verified token means user is loggen in to we redirect to home.
         this.navigate('home');
       } else {
-        //Handle error
-        let error = res;
-        throw error;
+          //Handle error
+          let error = res;
+          throw error;
       }
     } catch(error) {
         console.log("error response: " + error);
@@ -61,7 +55,7 @@ class Root extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome Friend {this.state.isLoggenIn}</Text>
+        <Text style={styles.title}>Welcome Friend </Text>
         <TouchableHighlight onPress={ this.navigate.bind(this,'register') } style={styles.button}>
           <Text style={styles.buttonText}>Register</Text>
         </TouchableHighlight>

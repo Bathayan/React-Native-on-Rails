@@ -21,36 +21,31 @@ class Home extends Component {
       isLoggenIn: "",
       showProgress: false,
       accessToken: "",
-      flash: this.props.flash,
     }
   }
   componentWillMount() {
     this.getToken();
   }
-  getToken(){
-    AsyncStorage.getItem(ACCESS_TOKEN, (err,accessToken)=> {
-      if(err){
-        throw err;
-      }
-      if(!accessToken){
-        this.redirect('login');
+  async getToken() {
+    try {
+      let accessToken = await AsyncStorage.getItem(ACCESS_TOKEN);
+      if(!accessToken) {
+          this.redirect('login');
       } else {
-        this.setState({accessToken: accessToken})
+          this.setState({accessToken: accessToken})
       }
-    }).catch((err)=> {
+    } catch(error) {
         console.log("Something went wrong");
         this.redirect('login');
-    });
+    }
   }
-  deleteToken(){
-    AsyncStorage.removeItem(ACCESS_TOKEN, (err,val)=> {
-      if(err){
-        throw err;
-      }
-      this.redirect('root');
-    }).catch((err)=> {
+  async deleteToken() {
+    try {
+        await AsyncStorage.removeItem(ACCESS_TOKEN)
+        this.redirect('root');
+    } catch(error) {
         console.log("Something went wrong");
-    });
+    }
   }
   redirect(routeName){
     this.props.navigator.push({
@@ -64,20 +59,18 @@ class Home extends Component {
     this.setState({showProgress: true})
     this.deleteToken();
   }
+
   confirmDelete() {
     AlertIOS.alert("Are you sure?", "This action cannot be undone", [
       {text: 'Cancel'}, {text: 'Delete', onPress: () => this.onDelete()}
     ]);
   }
+
   async onDelete(){
     let access_token = this.state.accessToken
     try {
       let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/users/'+access_token,{
                               method: 'DELETE',
-                              headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
-                              }
                             });
         let res = await response.text();
         if (response.status >= 200 && response.status < 300) {
@@ -88,13 +81,14 @@ class Home extends Component {
           throw error;
         }
     } catch(error) {
-      console.log("error: " + error)
+        console.log("error: " + error)
     }
   }
   render() {
+    //We check to se if there is a flash message. It will be passed in user update.
     let flashMessage;
-    if (this.state.flash) {
-       flashMessage = <FlashMessage flash={this.state.flash}/>
+    if (this.props.flash) {
+       flashMessage = <Text style={styles.flash}>{this.props.flash}</Text>
     } else {
        flashMessage = null
     }
@@ -124,14 +118,6 @@ class Home extends Component {
       </View>
     );
   }
-}
-
-const FlashMessage = (props) => {
-  return (
-    <View>
-      <Text style={styles.flash}>{props.flash}</Text>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({

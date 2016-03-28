@@ -19,13 +19,6 @@ import Home from './home';
 import Update from './update';
 
 class ReactNativeRailsAuth extends Component {
-  constructor(){
-    super();
-
-    this.state = {
-      isLoggenIn: ""
-    }
-  }
 
   renderScene(route, navigator) {
     console.log(route);
