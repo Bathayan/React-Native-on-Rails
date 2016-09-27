@@ -41,7 +41,7 @@ class Root extends Component {
       let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/verify?session%5Baccess_token%5D='+accessToken);
       let res = await response.text();
       if (response.status >= 200 && response.status < 300) {
-        //Verified token means user is loggen in to we redirect to home.
+        //Verified token means user is logged in so we redirect him to home.
         this.navigate('home');
       } else {
           //Handle error
